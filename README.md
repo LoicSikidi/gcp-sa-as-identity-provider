@@ -26,7 +26,7 @@ Please find below a typical application workflow:
 
 ### Prerequisites
 
-*Tips: if you cannot or don't want to install following tools on your machine, you can connect to your [CloudShell environment](https://shell.cloud.google.com/?show=terminal). Indeed in CloudShell all required softwares are already installed!*
+*Tips: if you cannot or don't want to install following tools on your machine, you can connect to your [CloudShell environment](https://shell.cloud.google.com/?show=ide%2Cterminal&cloudshell_git_repo=https://github.com/LoicSikidi/gcp-sa-as-identity-provider&cloudshell_open_in_editor=README.md&ephemeral=true). Indeed in CloudShell all required softwares are already installed!*
 
 #### Install gcloud
 
@@ -120,6 +120,14 @@ terraform init
 
 ### Deployment
 
+In order to perform tests the authorization server have 3 mocked users .
+
+| username | password | role |
+|----------|----------|------|
+| alice | strongP@s$w0rd | player |
+| bob | otherstrongP@s$w0rd | player |
+| charlie | root | admin |
+
 #### Option 1: Sign JWT with a Google-managed service account key (recommended)
 
 1. Deploy the infrastructure:
@@ -128,17 +136,23 @@ terraform init
 terraform apply -auto-approve -var=project_id=$PROJECT -var=region=$REGION -var=registry_name=$ARTIFACT_REGISTRY
 ```
 
-2. Produce and validate the access token:
+2. Produce an access token:
 
 ```bash
 # retrieve an access token from the authorization server
 ACCESS_TOKEN=$(curl -sS -X POST "$(terraform output -raw authorization_server_url)/token" -H "Content-Type: application/x-www-form-urlencoded" -d 'grant_type=password&username=alice&password=strongP@s$w0rd' | jq --raw-output .access_token)
 
+echo $ACCESS_TOKEN
+```
+
+⚠️ *Note: If is ACCESS_TOKEN equals `null` it's because IAM permissions of the service account attached to the authorization server aren't effective yet. Wait a minute, then repeat the operation in order to get the access token.*
+
+3. Validate the access token:
+
+```bash
 # use the access token to authenticate to the api
 curl -sS -H "Authorization: Bearer $ACCESS_TOKEN" -X GET "$(terraform output -raw api_url)/api/v1/games" | jq .
 ```
-
-⚠️ *Note: the call to the authorization server may failed because IAM permission isn't effective yet. Repeat the operation after a few seconds*
 
 #### Option 2: Sign JWT with a User-managed service account key (not recommended)
 
