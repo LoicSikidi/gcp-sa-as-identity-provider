@@ -6,7 +6,7 @@ Here by *identity provider*, I mean a **trusted authority** which signs access t
 
 **How does it works?**
 
-*Note: for a complete explanation, please refer to a dedicated [article]() posted on Medium.*
+*Note: for a complete explanation, please refer to a dedicated [article](https://medium.com/@loic.sikidi/use-a-gcp-service-account-as-an-identity-provider-c996cf717b4f) posted on Medium.*
 
 This project is composed of 2 components:
 - a simple authorization server which produces access tokens in JWT format
@@ -166,10 +166,3 @@ Destroy all resources with the command below.
 gcloud artifacts repositories delete $ARTIFACT_REGISTRY --location=$REGION -q
 terraform destroy -auto-approve -var=project_id=$PROJECT -var=region=$REGION
 ```
-
----
-
-### Terraform documentation
-
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
